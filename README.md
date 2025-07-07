@@ -72,3 +72,23 @@ This section describes the design and implementation of the backend API endpoint
 *   **Error Responses:**
     *   `400 Bad Request`: If `text` is missing in the request body.
     *   `500 Internal Server Error`: If there's an issue with Ollama communication, parsing its response, or invalid quiz data format.
+
+## Frontend Integration
+
+This section details the integration of the frontend with the backend API.
+
+1.  **API Connection:**
+    *   Installed `axios` for making HTTP requests.
+    *   Created `src/API/quizApi.js` to encapsulate API calls to the backend quiz generation endpoint.
+
+2.  **UI/UX Updates:**
+    *   Modified `src/pages/Upload.js` to handle file reading and call the `generateQuiz` API.
+    *   Implemented loading states while waiting for the backend response.
+    *   Added error display if the backend/API call fails.
+    *   Integrated navigation to `QuizReview.js` with the generated quiz data.
+
+3.  **Data Handling:**
+    *   Updated `src/pages/QuizReview.js` to receive and display the quiz data passed from the `Upload` page.
+    *   Basic parsing and validation of the backend response are handled within `quizController.js` and `ollamaService.js`.
+
+**Note:** To test the frontend integration, ensure both the backend server (on port 5000) and the Ollama server (on port 11434) are running. Then, start the frontend development server by running `npm start` in the root directory of the project.

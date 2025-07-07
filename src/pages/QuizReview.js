@@ -1,48 +1,45 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Trophy, BookOpen, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
 
 export default function QuizReview() {
   const navigate = useNavigate();
-  
-  // Sample review data
+  const location = useLocation();
+  const { quizData } = location.state || {};
+
+  // If quizData is not available, navigate back or show an error
+  if (!quizData || quizData.length === 0) {
+    // You might want to navigate back to upload or dashboard
+    // For now, let's just show a message
+    return (
+      <div className="text-center text-red-500">
+        No quiz data available. Please generate a quiz first.
+      </div>
+    );
+  }
+
+  // For now, let's assume all answers are correct for display purposes
+  // In a real scenario, you'd have user answers from the quiz taking process
+  const userAnswers = quizData.map(q => q.answer); // Assuming correct answers for review
+
+  // Calculate score (simple example: all correct for now)
+  const correctCount = quizData.length;
+  const score = (correctCount / quizData.length) * 100;
+  const duration = 0; // Placeholder for now, as we don't have quiz taking time yet
+
   const reviewData = {
     quiz: {
-      title: "Sample Reading Comprehension Quiz",
-      questions: [
-        {
-          question: "What is the main topic of this passage?",
-          options: [
-            "Environmental conservation",
-            "Technology advancement",
-            "Economic development",
-            "Social media impact"
-          ],
-          correct_answer: "Environmental conservation",
-          explanation: "The passage primarily discusses various environmental conservation methods and their effectiveness."
-        },
-        {
-          question: "According to the text, what percentage of people support renewable energy?",
-          options: ["45%", "67%", "78%", "89%"],
-          correct_answer: "78%",
-          explanation: "The text specifically mentions that 78% of survey respondents support renewable energy initiatives."
-        },
-        {
-          question: "Which solution is mentioned as most effective?",
-          options: [
-            "Solar panels",
-            "Wind turbines", 
-            "Hydroelectric dams",
-            "Nuclear power"
-          ],
-          correct_answer: "Solar panels",
-          explanation: "According to the research cited, solar panels showed the highest efficiency rating among renewable energy sources."
-        }
-      ]
+      title: "Generated Quiz",
+      questions: quizData.map(q => ({
+        question: q.question,
+        options: q.options,
+        correct_answer: q.answer,
+        explanation: "Explanation coming soon!"
+      }))
     },
-    userAnswers: ["Environmental conservation", "67%", "Solar panels"],
-    score: 67,
-    duration: 180 // 3 minutes in seconds
+    userAnswers: userAnswers,
+    score: score,
+    duration: duration
   };
 
   const formatTime = (seconds) => {

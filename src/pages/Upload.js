@@ -11,6 +11,7 @@ import {
   X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { generateQuiz } from "../API/quizApi";
 
 export default function Upload() {
   const navigate = useNavigate();
@@ -69,11 +70,19 @@ export default function Upload() {
     setIsProcessing(true);
     setError(null);
 
-    // Simulate processing for demo
-    setTimeout(() => {
-      setIsProcessing(false);
-      alert("Quiz generation feature coming soon! This is a demo version.");
-    }, 2000);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const textContent = e.target.result;
+      try {
+        const quizData = await generateQuiz(textContent, 5); // Request 5 questions
+        setIsProcessing(false);
+        navigate('/quiz-review', { state: { quizData } });
+      } catch (err) {
+        setIsProcessing(false);
+        setError(err.message || 'Failed to generate quiz. Please try again.');
+      }
+    };
+    reader.readAsText(file); // Read the file as text
   };
 
   const removeFile = () => {
