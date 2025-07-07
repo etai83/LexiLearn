@@ -1,0 +1,30 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the uploaded document"
+    },
+    "content": {
+      "type": "string",
+      "description": "Extracted text content from the PDF"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL to the uploaded PDF file"
+    },
+    "word_count": {
+      "type": "number",
+      "description": "Number of words in the document"
+    },
+    "reading_level": {
+      "type": "string",
+      "description": "Estimated reading difficulty level"
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ]
+}

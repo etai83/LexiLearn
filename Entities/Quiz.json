@@ -1,0 +1,66 @@
+{
+  "name": "Quiz",
+  "type": "object",
+  "properties": {
+    "document_id": {
+      "type": "string",
+      "description": "Reference to the document this quiz is based on"
+    },
+    "title": {
+      "type": "string",
+      "description": "Quiz title (usually same as document title)"
+    },
+    "score": {
+      "type": "number",
+      "description": "Final score out of 5"
+    },
+    "total_questions": {
+      "type": "number",
+      "default": 5,
+      "description": "Total number of questions in the quiz"
+    },
+    "time_spent": {
+      "type": "number",
+      "description": "Time spent on quiz in seconds"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the quiz was completed"
+    },
+    "questions": {
+      "type": "array",
+      "description": "Quiz questions and answers",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "correct_answer": {
+            "type": "string"
+          },
+          "user_answer": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "supporting_text": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "document_id",
+    "title"
+  ]
+}
