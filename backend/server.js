@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/ollama', ollamaRoutes);
+app.use('/api/quiz', quizRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).send('OK');

@@ -42,3 +42,33 @@ This section details the integration of Ollama for AI model interaction.
     *   Documented usage and limitations in this `README.md`.
 
 **Note:** To run the Ollama integration, ensure the Ollama server is running and accessible, typically at `http://localhost:11434`.
+
+## API Design
+
+This section describes the design and implementation of the backend API endpoints.
+
+### Quiz Generation API
+
+*   **Endpoint:** `POST /api/quiz/generate`
+*   **Description:** Generates a multiple-choice quiz based on provided text content using the Ollama service.
+*   **Request Body:**
+    ```json
+    {
+      "text": "Your long text content here from which to generate the quiz.",
+      "numQuestions": 5 // Optional, default is 5
+    }
+    ```
+*   **Success Response (200 OK):**
+    ```json
+    [
+      {
+        "question": "What is the capital of France?",
+        "options": ["Berlin", "Madrid", "Paris", "Rome"],
+        "answer": "Paris"
+      },
+      // ... more questions
+    ]
+    ```
+*   **Error Responses:**
+    *   `400 Bad Request`: If `text` is missing in the request body.
+    *   `500 Internal Server Error`: If there's an issue with Ollama communication, parsing its response, or invalid quiz data format.
