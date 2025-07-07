@@ -92,3 +92,35 @@ This section details the integration of the frontend with the backend API.
     *   Basic parsing and validation of the backend response are handled within `quizController.js` and `ollamaService.js`.
 
 **Note:** To test the frontend integration, ensure both the backend server (on port 5000) and the Ollama server (on port 11434) are running. Then, start the frontend development server by running `npm start` in the root directory of the project.
+
+## Testing & Deployment
+
+This section outlines the testing and deployment procedures for LexiLearn.
+
+### Backend Testing
+
+*   **Unit Tests:**
+    *   Implemented unit tests for `ollamaService.js` to ensure proper interaction with the Ollama API and error handling.
+*   **Integration Tests:**
+    *   Implemented integration tests for the quiz generation API endpoint (`POST /api/quiz/generate`) using `supertest` to verify correct request handling, Ollama service interaction, and response formatting.
+*   **Error Handling & Edge Cases:**
+    *   Tests cover scenarios like missing request data, Ollama service failures, and invalid Ollama responses.
+
+### Frontend Testing
+
+*   **API Integration:** (Pending)
+    *   Verify that the frontend correctly communicates with the backend API for quiz generation.
+*   **UI Validation:** (Pending)
+    *   Ensure the user interface updates correctly for all states (loading, error, success) during the quiz generation process.
+
+### End-to-End Testing
+
+*   **Full Quiz Generation Flow:** (Pending)
+    *   Simulate the complete process from document upload to quiz display to validate data consistency and user experience.
+
+### Deployment
+
+*   **Setup Scripts:** (Pending)
+    *   Develop scripts to run the backend and frontend applications together for production environments.
+*   **Environment Variables & Steps:** (Pending)
+    *   Document all necessary environment variables and detailed deployment steps in this `README.md`.

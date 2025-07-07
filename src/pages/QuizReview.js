@@ -48,9 +48,7 @@ export default function QuizReview() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const correctCount = reviewData.userAnswers.filter((answer, index) => 
-    answer === reviewData.quiz.questions[index].correct_answer
-  ).length;
+  
 
   return (
     <div className="space-y-6">

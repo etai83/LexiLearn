@@ -1,9 +1,9 @@
 # Testing & Deployment Tasks
 
 ## 1. Backend Testing
-- [ ] 1.1 Write unit tests for Ollama service
-- [ ] 1.2 Write integration tests for API endpoints
-- [ ] 1.3 Test error handling and edge cases
+- [x] 1.1 Write unit tests for Ollama service
+- [x] 1.2 Write integration tests for API endpoints
+- [x] 1.3 Test error handling and edge cases
 
 ## 2. Frontend Testing
 - [ ] 2.1 Test frontend API integration with backend
