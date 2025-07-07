@@ -269,7 +269,7 @@ export default function Quiz() {
           ) : (
             <Button
               onClick={goToNextQuestion}
-              disabled={!canGoNext}
+              disabled={!canGoNext || !answers[currentQuestionIndex]}
             >
               {isHebrew ? 'הבא' : 'Next'}
               <ArrowRight className={`w-4 h-4 ${isHebrew ? 'mr-2' : 'ml-2'}`} />

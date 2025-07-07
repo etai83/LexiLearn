@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Document, Quiz } from "@/entities/all";
 import { UploadFile, ExtractDataFromUploadedFile, InvokeLLM } from "@/integrations/Core";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
+
 import { 
   Upload as UploadIcon, 
   FileText, 
@@ -29,7 +28,7 @@ export default function Upload() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
-  const [document, setDocument] = useState(null);
+  
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = [
@@ -93,6 +92,7 @@ export default function Upload() {
 
     try {
       // Step 1: Upload file
+      setCurrentStep(0);
       setProgress(20);
       const { file_url } = await UploadFile({ file });
       
@@ -111,24 +111,16 @@ export default function Upload() {
         }
       });
 
-      if (extractResult.status !== "success") {
-        throw new Error("Failed to extract text from PDF");
+      if (extractResult.status !== "success" || !extractResult.output.content) {
+        throw new Error("Failed to extract text from PDF. The document might be empty or corrupted.");
       }
       
       const content = extractResult.output.content;
       const isHebrew = /[\u0590-\u05FF]/.test(content);
 
       const promptInstruction = isHebrew
-        ? `בהתבסס על הטקסט הבא, צור בדיוק 5 שאלות רב-ברירה (אמריקאיות) לבדיקת הבנת הנקרא. כל שאלה צריכה לבחון הבנה של התוכן. עבור כל שאלה, ספק 4 אפשרויות עם תשובה נכונה אחת בלבד. בנוסף, ספק הסבר קצר לתשובה הנכונה וציין את קטע הטקסט התומך מהמאמר.
-
-טקסט: "${content}"
-
-אנא פרמט את תגובתך כאובייקט JSON. חשוב מאוד: השדה 'correct_answer' צריך להכיל את הטקסט המלא של התשובה הנכונה, לא את האינדקס או האות שלה.`
-        : `Based on the following text, create exactly 5 multiple choice reading comprehension questions. Each question should test understanding of the content, not trivial details. For each question, provide 4 options with only one correct answer. Also provide a brief explanation for the correct answer and identify the supporting text from the passage.
-
-Text: "${content}"
-
-Please format your response as a JSON object. VERY IMPORTANT: The 'correct_answer' field must contain the full text of the correct option, not its index or letter.`;
+        ? `בהתבסס על הטקסט הבא, צור בדיוק 5 שאלות רב-ברירה (אמריקאיות) לבדיקת הבנת הנקרא. כל שאלה צריכה לבחון הבנה של התוכן. עבור כל שאלה, ספק 4 אפשרויות עם תשובה נכונה אחת בלבד. בנוסף, ספק הסבר קצר לתשובה הנכונה וציין את קטע הטקסט התומך מהמאמר.\n\nטקסט: "${content}"\n\nאנא פרמט את תגובתך כאובייקט JSON. חשוב מאוד: השדה 'correct_answer' צריך להכיל את הטקסט המלא של התשובה הנכונה, לא את האינדקס או האות שלה.`
+        : `Based on the following text, create exactly 5 multiple choice reading comprehension questions. Each question should test understanding of the content, not trivial details. For each question, provide 4 options with only one correct answer. Also provide a brief explanation for the correct answer and identify the supporting text from the passage.\n\nText: "${content}"\n\nPlease format your response as a JSON object. VERY IMPORTANT: The 'correct_answer' field must contain the full text of the correct option, not its index or letter.`;
 
       const jsonStructure = `{
   "questions": [
@@ -148,15 +140,14 @@ Please format your response as a JSON object. VERY IMPORTANT: The 'correct_answe
       setCurrentStep(2);
       setProgress(60);
       const documentData = {
-        title: extractResult.output.title || file.name.replace('.pdf', ''),
+        title: extractResult.output.title || file.name.replace(/\.pdf$/, ''),
         content: content,
         file_url: file_url,
-        word_count: extractResult.output.word_count || content.split(' ').length,
-        reading_level: "Intermediate" // Could be enhanced with actual analysis
+        word_count: extractResult.output.word_count || content.split(/\s+/).length,
+        reading_level: "Intermediate" // This could be enhanced with actual analysis
       };
 
       const createdDocument = await Document.create(documentData);
-      setDocument(createdDocument);
 
       // Step 4: Generate questions
       setCurrentStep(3);
@@ -184,6 +175,10 @@ Please format your response as a JSON object. VERY IMPORTANT: The 'correct_answe
         }
       });
 
+      if (!questionsResult.questions || questionsResult.questions.length === 0) {
+        throw new Error("The AI failed to generate questions for this document.");
+      }
+
       // Step 5: Create quiz
       setCurrentStep(4);
       setProgress(100);
@@ -191,7 +186,7 @@ Please format your response as a JSON object. VERY IMPORTANT: The 'correct_answe
         document_id: createdDocument.id,
         title: documentData.title,
         total_questions: 5,
-        questions: questionsResult.questions || []
+        questions: questionsResult.questions
       };
 
       const createdQuiz = await Quiz.create(quizData);
@@ -203,8 +198,10 @@ Please format your response as a JSON object. VERY IMPORTANT: The 'correct_answe
 
     } catch (error) {
       console.error("Error processing document:", error);
-      setError("Failed to process document. Please try again.");
+      setError(`An error occurred: ${error.message}. Please try another document.`);
       setIsProcessing(false);
+      setProgress(0);
+      setCurrentStep(0);
     }
   };
 

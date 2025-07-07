@@ -1,12 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import PropTypes from 'prop-types';
 
-export default function QuestionCard({ 
-  question, 
-  questionIndex, 
-  selectedAnswer, 
-  onAnswerSelect 
+export default function QuestionCard({
+  question,
+  questionIndex,
+  selectedAnswer,
+  onAnswerSelect,
 }) {
   const handleAnswerClick = (optionIndex) => {
     const optionLetter = String.fromCharCode(65 + optionIndex); // A, B, C, D
@@ -19,19 +19,19 @@ export default function QuestionCard({
         <h3 className="text-lg font-medium text-slate-900 mb-4 leading-relaxed">
           {question.question}
         </h3>
-        
+
         <div className="space-y-3">
           {question.options?.map((option, index) => {
             const optionLetter = String.fromCharCode(65 + index);
             const isSelected = selectedAnswer === optionLetter;
-            
+
             return (
               <Button
                 key={index}
                 variant={isSelected ? "default" : "outline"}
                 className={`w-full text-left justify-start h-auto p-4 ${
-                  isSelected 
-                    ? "bg-blue-600 text-white hover:bg-blue-700" 
+                  isSelected
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
                     : "bg-white hover:bg-slate-50"
                 }`}
                 onClick={() => handleAnswerClick(index)}
@@ -51,7 +51,7 @@ export default function QuestionCard({
           })}
         </div>
       </div>
-      
+
       {selectedAnswer && (
         <div className="pt-4 border-t">
           <p className="text-sm text-slate-600">
@@ -62,3 +62,13 @@ export default function QuestionCard({
     </div>
   );
 }
+
+QuestionCard.propTypes = {
+  question: PropTypes.shape({
+    question: PropTypes.string.isRequired,
+    options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+  questionIndex: PropTypes.number.isRequired,
+  selectedAnswer: PropTypes.string,
+  onAnswerSelect: PropTypes.func.isRequired,
+};

@@ -1,14 +1,11 @@
-
 import React, { useState, useEffect } from "react";
 import { Quiz as QuizEntity } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Target, 
+import {
+  CheckCircle,
+  XCircle,
   BookOpen,
   ArrowLeft,
   Award
@@ -16,6 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { format } from "date-fns";
+import PropTypes from 'prop-types';
 
 export default function QuizReview() {
   const navigate = useNavigate();
@@ -214,7 +212,7 @@ export default function QuizReview() {
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-medium" dir="auto">
+                            <span className="font-medium" dir={isHebrew ? 'rtl' : 'ltr'}>
                               {optionLetter}. {option}
                             </span>
                             <div className="flex items-center gap-2">
@@ -248,7 +246,7 @@ export default function QuizReview() {
                 {question.supporting_text && (
                   <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
                     <h5 className="font-medium text-slate-900 mb-2">{isHebrew ? 'טקסט תומך' : 'Supporting Text'}</h5>
-                    <p className="text-slate-700 italic" dir="auto">"{question.supporting_text}"</p>
+                    <p className="text-slate-700 italic" dir="auto">&quot;{question.supporting_text}&quot;</p>
                   </div>
                 )}
               </CardContent>
@@ -259,3 +257,21 @@ export default function QuizReview() {
     </div>
   );
 }
+
+QuizReview.propTypes = {
+  quiz: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    score: PropTypes.number,
+    total_questions: PropTypes.number,
+    time_spent: PropTypes.number,
+    completed_at: PropTypes.string,
+    questions: PropTypes.arrayOf(PropTypes.shape({
+      question: PropTypes.string.isRequired,
+      options: PropTypes.arrayOf(PropTypes.string).isRequired,
+      correct_answer: PropTypes.string.isRequired,
+      user_answer: PropTypes.string,
+      explanation: PropTypes.string,
+      supporting_text: PropTypes.string,
+    })).isRequired,
+  }).isRequired,
+};

@@ -1,20 +1,18 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Trophy, 
-  Target, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Trophy,
+  CheckCircle,
+  XCircle,
   BarChart3,
   Home,
   Upload
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import PropTypes from 'prop-types';
 
 export default function QuizResults({ results, quiz }) {
   const navigate = useNavigate();
@@ -152,10 +150,9 @@ export default function QuizResults({ results, quiz }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {results.questions.map((question, index) => (
                 <div key={index} className="text-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 ${
-                    question.user_answer === question.correct_answer
-                      ? 'bg-green-100 text-green-600'
-                      : 'bg-red-100 text-red-600'
+                  <div className={`w-10 h-10 rounded-full ${question.user_answer === question.correct_answer
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-red-100 text-red-600'
                   }`}>
                     {question.user_answer === question.correct_answer ? (
                       <CheckCircle className="w-5 h-5" />
@@ -173,3 +170,19 @@ export default function QuizResults({ results, quiz }) {
     </div>
   );
 }
+
+QuizResults.propTypes = {
+  results: PropTypes.shape({
+    percentage: PropTypes.number.isRequired,
+    score: PropTypes.number.isRequired,
+    totalQuestions: PropTypes.number.isRequired,
+    timeSpent: PropTypes.number.isRequired,
+    questions: PropTypes.arrayOf(PropTypes.shape({
+      user_answer: PropTypes.string,
+      correct_answer: PropTypes.string.isRequired,
+    })).isRequired,
+  }).isRequired,
+  quiz: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
+};

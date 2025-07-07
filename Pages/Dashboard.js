@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Quiz, Document, User } from "@/entities/all";
+import { Quiz, User } from "@/entities/all";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
@@ -20,17 +20,18 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import PropTypes from 'prop-types';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
-  const [documents, setDocuments] = useState([]);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalQuizzes: 0,
     averageScore: 0,
-    totalDocuments: 0,
-    weeklyProgress: 0
+    weeklyProgress: 0,
+    totalTimeSpent: 0
   });
 
   useEffect(() => {
@@ -42,13 +43,11 @@ export default function Dashboard() {
       const userData = await User.me();
       setUser(userData);
 
-      const [quizzesData, documentsData] = await Promise.all([
-        Quiz.filter({ created_by: userData.email }, '-created_date', 50),
-        Document.filter({ created_by: userData.email }, '-created_date', 20)
+      const [quizzesData] = await Promise.all([
+        Quiz.filter({ created_by: userData.email }, '-created_date', 50)
       ]);
 
       setQuizzes(quizzesData);
-      setDocuments(documentsData);
 
       // Calculate stats
       const totalQuizzes = quizzesData.length;
@@ -56,6 +55,8 @@ export default function Dashboard() {
         ? quizzesData.reduce((sum, quiz) => sum + (quiz.score || 0), 0) / totalQuizzes 
         : 0;
       
+      const totalTimeSpent = quizzesData.reduce((sum, quiz) => sum + (quiz.time_spent || 0), 0);
+
       const weekStart = new Date();
       weekStart.setDate(weekStart.getDate() - 7);
       const weeklyQuizzes = quizzesData.filter(quiz => 
@@ -65,8 +66,8 @@ export default function Dashboard() {
       setStats({
         totalQuizzes,
         averageScore: Math.round(averageScore * 100) / 100,
-        totalDocuments: documentsData.length,
-        weeklyProgress: weeklyQuizzes
+        weeklyProgress: weeklyQuizzes,
+        totalTimeSpent
       });
     } catch (error) {
       console.error("Error loading dashboard data:", error);
@@ -74,11 +75,7 @@ export default function Dashboard() {
     setIsLoading(false);
   };
 
-  const getScoreColor = (score) => {
-    if (score >= 4) return "text-green-600";
-    if (score >= 3) return "text-yellow-600";
-    return "text-red-600";
-  };
+  
 
   const getScoreBadge = (score) => {
     if (score >= 4) return "bg-green-100 text-green-800";
@@ -101,7 +98,7 @@ export default function Dashboard() {
       }));
   };
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -116,6 +113,12 @@ export default function Dashboard() {
       );
     }
     return null;
+  };
+
+  CustomTooltip.propTypes = {
+    active: PropTypes.bool,
+    payload: PropTypes.array,
+    
   };
 
   if (isLoading) {
@@ -140,7 +143,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Welcome back, {user?.full_name?.split(' ')[0] || 'there'}!
+            Welcome back, {user?.full_name?.split(' ')[0] || 'there'}
           </h1>
           <p className="text-slate-600">
             Track your reading comprehension progress and continue improving your skills.
@@ -157,7 +160,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold text-blue-900">{stats.totalQuizzes}</div>
               <p className="text-xs text-blue-600 mt-1">
-                {stats.totalDocuments} documents uploaded
+                quizzes completed
               </p>
             </CardContent>
           </Card>
@@ -189,6 +192,21 @@ export default function Dashboard() {
               <div className="text-2xl font-bold text-purple-900">{stats.weeklyProgress}</div>
               <p className="text-xs text-purple-600 mt-1">
                 quizzes completed
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-yellow-800">Total Time Spent</CardTitle>
+              <Clock className="h-4 w-4 text-yellow-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-900">
+                {Math.floor(stats.totalTimeSpent / 60)}m {stats.totalTimeSpent % 60}s
+              </div>
+              <p className="text-xs text-yellow-600 mt-1">
+                across all quizzes
               </p>
             </CardContent>
           </Card>

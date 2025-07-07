@@ -2,16 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { User } from "@/entities/User";
-import { 
-  BookOpen, 
-  BarChart3, 
-  Upload, 
-  Trophy, 
+import {
+  BookOpen,
+  BarChart3,
+  Upload,
+  Trophy,
   Settings,
   Menu,
   X,
   LogOut,
-  User as UserIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import PropTypes from 'prop-types';
 
 const navigationItems = [
   {
@@ -38,7 +38,7 @@ const navigationItems = [
   }
 ];
 
-export default function Layout({ children, currentPageName }) {
+export default function Layout({ children }) {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -52,7 +52,7 @@ export default function Layout({ children, currentPageName }) {
     try {
       const userData = await User.me();
       setUser(userData);
-    } catch (error) {
+    } catch (_error) {
       console.log("User not authenticated");
     }
     setIsLoading(false);
@@ -193,6 +193,11 @@ export default function Layout({ children, currentPageName }) {
                     <p className="text-xs leading-none text-slate-500">{user.email}</p>
                   </div>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
@@ -251,3 +256,7 @@ export default function Layout({ children, currentPageName }) {
     </div>
   );
 }
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
