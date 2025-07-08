@@ -6,7 +6,7 @@ async function generateResponse(prompt) {
   try {
     console.log(`Sending prompt to Ollama: ${prompt}`);
     const response = await axios.post(OLLAMA_API_URL, {
-      model: 'llama2', // You can make this configurable or choose a default model
+      model: 'deepseek-r1:8b', // You can make this configurable or choose a default model
       prompt: prompt,
       stream: false, // For simplicity, we'll get the full response at once
     });

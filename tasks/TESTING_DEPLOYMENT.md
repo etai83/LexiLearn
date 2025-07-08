@@ -6,8 +6,8 @@
 - [x] 1.3 Test error handling and edge cases
 
 ## 2. Frontend Testing
-- [ ] 2.1 Test frontend API integration with backend
-- [ ] 2.2 Validate UI for all states (loading, error, success)
+- [x] 2.1 Test frontend API integration with backend
+- [x] 2.2 Validate UI for all states (loading, error, success)
 
 ## 3. End-to-End Testing
 - [ ] 3.1 Simulate full quiz generation flow

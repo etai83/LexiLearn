@@ -70,19 +70,18 @@ export default function Upload() {
     setIsProcessing(true);
     setError(null);
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const textContent = e.target.result;
-      try {
-        const quizData = await generateQuiz(textContent, 5); // Request 5 questions
-        setIsProcessing(false);
-        navigate('/quiz-review', { state: { quizData } });
-      } catch (err) {
-        setIsProcessing(false);
-        setError(err.message || 'Failed to generate quiz. Please try again.');
-      }
-    };
-    reader.readAsText(file); // Read the file as text
+    const formData = new FormData();
+    formData.append('pdfFile', file);
+    formData.append('numQuestions', 5); // Request 5 questions
+
+    try {
+      const quizData = await generateQuiz(formData);
+      setIsProcessing(false);
+      navigate('/quiz-review', { state: { quizData } });
+    } catch (err) {
+      setIsProcessing(false);
+      setError(err.message || 'Failed to generate quiz. Please try again.');
+    }
   };
 
   const removeFile = () => {

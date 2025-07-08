@@ -22,10 +22,9 @@ export default function QuizReview() {
   // In a real scenario, you'd have user answers from the quiz taking process
   const userAnswers = quizData.map(q => q.answer); // Assuming correct answers for review
 
-  // Calculate score (simple example: all correct for now)
-  const correctCount = quizData.length;
-  const score = (correctCount / quizData.length) * 100;
-  const duration = 0; // Placeholder for now, as we don't have quiz taking time yet
+  // Calculate actual correct count and score
+  const actualCorrectCount = quizData.filter((q, index) => userAnswers[index] === q.answer).length;
+  const actualScore = (actualCorrectCount / quizData.length) * 100;
 
   const reviewData = {
     quiz: {
@@ -38,8 +37,9 @@ export default function QuizReview() {
       }))
     },
     userAnswers: userAnswers,
-    score: score,
-    duration: duration
+    score: actualScore,
+    duration: 0, // Placeholder for now, as we don't have quiz taking time yet
+    correctCount: actualCorrectCount // Add correctCount to reviewData
   };
 
   const formatTime = (seconds) => {
@@ -71,7 +71,7 @@ export default function QuizReview() {
           </div>
           <div className="space-y-2">
             <div className="text-3xl font-bold text-blue-600">
-              {correctCount}/{reviewData.quiz.questions.length}
+              {reviewData.correctCount}/{reviewData.quiz.questions.length}
             </div>
             <p className="text-gray-600">Correct Answers</p>
           </div>

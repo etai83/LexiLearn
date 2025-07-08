@@ -1,20 +1,40 @@
 const ollamaService = require('../services/ollamaService');
+const pdfParse = require('pdf-parse');
 
 async function generateQuiz(req, res) {
-  const { text, numQuestions } = req.body;
-
-  if (!text) {
-    return res.status(400).json({ error: 'Text content is required to generate a quiz.' });
+  if (!req.file || !req.file.buffer) {
+    return res.status(400).json({ error: 'PDF file is required.' });
   }
 
-  const prompt = `Generate a quiz with ${numQuestions || 5} multiple-choice questions based on the following text. Provide the questions, 4 options for each question, and the correct answer. Format the output as a JSON array of objects, where each object has 'question', 'options' (an array of strings), and 'answer' (the correct option string). Text: ${text}`;
+  let textContent;
+  try {
+    const data = await pdfParse(req.file.buffer);
+    textContent = data.text;
+  } catch (pdfError) {
+    console.error('Error parsing PDF:', pdfError);
+    return res.status(500).json({ error: 'Failed to parse PDF content.' });
+  }
+
+  const numQuestions = req.body.numQuestions || 5;
+
+  if (!textContent || textContent.trim().length === 0) {
+    return res.status(400).json({ error: 'No readable text found in the PDF.' });
+  }
+
+  const prompt = `Generate a quiz with ${numQuestions} multiple-choice questions based on the following text. Provide the questions, 4 options for each question, and the correct answer. Format the output as a JSON array of objects, where each object has 'question', 'options' (an array of strings), and 'answer' (the correct option string). Text: ${textContent}`;
 
   try {
     const ollamaResponse = await ollamaService.generateResponse(prompt);
     // Attempt to parse the JSON response from Ollama
     let quizData;
     try {
-      quizData = JSON.parse(ollamaResponse);
+      const jsonMatch = ollamaResponse.match(/```json\n([\s\S]*?)\n```/);
+      if (jsonMatch && jsonMatch[1]) {
+        quizData = JSON.parse(jsonMatch[1]);
+      } else {
+        // Fallback if no ```json block is found, try to parse directly
+        quizData = JSON.parse(ollamaResponse);
+      }
     } catch (parseError) {
       console.error('Failed to parse Ollama response as JSON:', parseError);
       console.error('Ollama raw response:', ollamaResponse);
